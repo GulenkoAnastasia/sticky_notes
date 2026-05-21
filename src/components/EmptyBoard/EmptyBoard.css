@@ -1,0 +1,18 @@
+.empty-board-container {
+  display: flex;
+  height: 100%;
+}
+
+.empty-board-hint {
+  width: fit-content;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: auto;
+  color: var(--color-gray-text);
+  border-radius: 12px;
+  padding: 40px 60px;
+  user-select: none;
+  flex-direction: column;
+}
+

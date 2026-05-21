@@ -1,0 +1,1 @@
+export { EmptyBoard } from "./EmptyBoard";

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <rect x="4" y="4" width="24" height="24" rx="3" fill="#f9e04b"/>
+  <path d="M20 28 L28 20 L28 28 Z" fill="#a38900"/>
+  <rect x="4" y="4" width="24" height="24" rx="3" fill="none" clip-path="url(#fold)"/>
+  <clipPath id="fold">
+    <polygon points="4,4 28,4 28,20 20,28 4,28"/>
+  </clipPath>
+  <rect x="4" y="4" width="24" height="24" rx="3" fill="#f9e04b" clip-path="url(#fold)"/>
+  <path d="M20 28 L28 20 L20 20 Z" fill="#a38900" opacity="0.4"/>
+</svg>

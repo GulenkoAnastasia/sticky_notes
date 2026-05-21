@@ -1,0 +1,30 @@
+:root {
+  --color-white: white;
+  --color-board-bg: #f5f4f0;
+  --color-gray-border: #ccc;
+  --color-gray-text: #888;
+  --color-error: #9b3f3f;
+  --color-error-bg: #f0d0d0;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#root {
+  width: 100%;
+  height: 100vh;
+}
+
+h1 {
+  font-size: 22px;
+  font-weight: 500;
+}

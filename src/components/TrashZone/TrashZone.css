@@ -1,0 +1,19 @@
+.trash-zone {
+  pointer-events: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 72px;
+  border-top: 1px dashed var(--color-gray-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--color-gray-text);
+}
+
+.trash-zone.over {
+  background: var(--color-error-bg);
+  border-color: var(--color-error);
+}
