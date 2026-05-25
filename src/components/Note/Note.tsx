@@ -7,62 +7,70 @@ import RemoveIcon from "../../assets/icons/trash-full.svg?react";
 
 interface NoteProps {
   note: NoteType;
-  onUpdate: (id: string, changes: Partial<NoteType>) => void;
+  index: number;
+  onUpdate: (id: string, changes: Omit<Partial<NoteType>, "id">) => void;
   onRemove: (id: string) => void;
-  onBringToFront: (id: string) => void;
+  onBringToFront?: (id: string) => void;
   onDragMove?: (x: number, y: number) => void;
-  onDragEnd?: (id: string) => void;
+  onDragEnd?: (id: string, pos: { x: number; y: number }) => void;
 }
 
-export const Note = memo<NoteProps>(({
-  note,
-  onUpdate,
-  onRemove,
-  onBringToFront,
-  onDragMove,
-  onDragEnd,
-}) => {
-  const { onDragStart: handleDragStart, onResizeStart } = useNoteInteractions(
+export const Note = memo<NoteProps>(
+  ({
     note,
+    index,
     onUpdate,
+    onRemove,
+    onBringToFront,
     onDragMove,
     onDragEnd,
-  );
+  }) => {
+    const {
+      elementRef,
+      onDragStart: handleDragStart,
+      onResizeStart,
+    } = useNoteInteractions(note, onUpdate, onDragMove, onDragEnd);
 
-  return (
-    <div
-      className="note"
-      onMouseDown={() => onBringToFront(note.id)}
-      onDoubleClick={(e) => e.stopPropagation()}
-      style={{
-        left: note.x,
-        top: note.y,
-        width: note.width,
-        height: note.height,
-        zIndex: note.zIndex,
-        background: COLOR_MAP[note.color].bg,
-      }}
-    >
+    return (
       <div
-        className="note__header"
-        style={{ background: COLOR_MAP[note.color].border }}
-        onMouseDown={handleDragStart}
+        ref={elementRef}
+        className="note"
+        onMouseDown={() => onBringToFront?.(note.id)}
+        onDoubleClick={(e) => e.stopPropagation()}
+        style={{
+          left: note.x,
+          top: note.y,
+          width: note.width,
+          height: note.height,
+          zIndex: index + 1,
+          background: COLOR_MAP[note.color].bg,
+        }}
       >
-        <button
-          className="note__delete"
-          onMouseDown={(e) => e.stopPropagation()}
-          onClick={() => onRemove(note.id)}
+        <div
+          className="note__header"
+          style={{ background: COLOR_MAP[note.color].border }}
+          onMouseDown={handleDragStart}
         >
-          <RemoveIcon width={20} height={20} color={COLOR_MAP[note.color].bg} />
-        </button>
+          <button
+            className="note__delete"
+            onMouseDown={(e) => e.stopPropagation()}
+            onClick={() => onRemove(note.id)}
+          >
+            <RemoveIcon
+              width={20}
+              height={20}
+              color={COLOR_MAP[note.color].bg}
+            />
+          </button>
+        </div>
+        <textarea
+          className="note__text"
+          value={note.text}
+          onChange={(e) => onUpdate(note.id, { text: e.target.value })}
+          placeholder="Type something..."
+        />
+        <div className="note__resize" onMouseDown={onResizeStart} />
       </div>
-      <textarea
-        className="note__text"
-        value={note.text}
-        onChange={(e) => onUpdate(note.id, { text: e.target.value })}
-        placeholder="Type something..."
-      />
-      <div className="note__resize" onMouseDown={onResizeStart} />
-    </div>
-  );
-});
+    );
+  },
+);

@@ -1,13 +1,16 @@
 import { useCallback, useEffect, useState } from "react";
 import type { Note, NoteColor } from "../types";
 import { NOTE_DEFAULTS } from "../constants";
+import { isValidNote } from "../utils/validateNotes";
 
 const STORAGE_KEY = "notes";
 
 const load = (): Note[] => {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
-    return saved ? JSON.parse(saved) : [];
+    const parsed = saved ? JSON.parse(saved) : [];
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(isValidNote);
   } catch {
     return [];
   }
@@ -30,25 +33,27 @@ export const useNotes = () => {
         height: NOTE_DEFAULTS.height,
         text: "",
         color,
-        zIndex: prev.length ? Math.max(...prev.map((n) => n.zIndex)) + 1 : 1,
       };
 
       return [...prev, note];
     });
   }, []);
 
-  const updateNote = useCallback((id: string, changes: Partial<Note>) => {
-    setNotes((prev) =>
-      prev.map((note) => (note.id === id ? { ...note, ...changes } : note)),
-    );
-  }, []);
+  const updateNote = useCallback(
+    (id: string, changes: Omit<Partial<Note>, "id">) => {
+      setNotes((prev) =>
+        prev.map((note) => (note.id === id ? { ...note, ...changes } : note)),
+      );
+    },
+    [],
+  );
 
   const bringToFront = useCallback((id: string) => {
     setNotes((prev) => {
-      const maxZ = Math.max(...prev.map((note) => note.zIndex));
-      return prev.map((note) =>
-        note.id === id ? { ...note, zIndex: maxZ + 1 } : note,
-      );
+      const note = prev.find((note) => note.id === id);
+      if (!note) return prev;
+
+      return [...prev.filter((note) => note.id !== id), note];
     });
   }, []);
 

@@ -6,21 +6,32 @@ import { attachMouseListeners } from "../utils/attachMouseListeners";
 
 export const useNoteInteractions = (
   note: Note,
-  onUpdate: (id: string, changes: Partial<Note>) => void,
+  onUpdate: (id: string, changes: Omit<Partial<Note>, "id">) => void,
   onDragMove?: (x: number, y: number) => void,
-  onDragEnd?: (id: string) => void,
+  onDragEnd?: (id: string, position: { x: number; y: number }) => void,
 ) => {
+  const elementRef = useRef<HTMLDivElement>(null);
   const offsetRef = useRef({ x: 0, y: 0 });
 
   const onMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
     offsetRef.current = { x: e.clientX - note.x, y: e.clientY - note.y };
+    let position = { x: note.x, y: note.y };
+
     attachMouseListeners(
       (e) => {
-        onUpdate(note.id, { x: e.clientX - offsetRef.current.x, y: e.clientY - offsetRef.current.y });
+        const x = e.clientX - offsetRef.current.x;
+        const y = e.clientY - offsetRef.current.y;
+        position = { x, y };
+
+        if (elementRef.current) {
+          elementRef.current.style.left = `${x}px`;
+          elementRef.current.style.top = `${y}px`;
+        }
+
         onDragMove?.(e.clientX, e.clientY);
       },
-      () => onDragEnd?.(note.id),
+      () => onDragEnd?.(note.id, position),
     );
   };
 
@@ -39,5 +50,5 @@ export const useNoteInteractions = (
     );
   };
 
-  return { onDragStart: onMouseDown, onResizeStart };
+  return { elementRef, onDragStart: onMouseDown, onResizeStart };
 };

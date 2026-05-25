@@ -30,26 +30,28 @@ export const Board: FC<BoardProps> = ({ selectedColor }) => {
   };
 
   const handleDragEnd = useCallback(
-    (id: string) => {
+    (id: string, position: { x: number; y: number }) => {
       setIsDragging(false);
       setIsOverTrash((prev) => {
         if (prev) removeNote(id);
+        else updateNote(id, position);
         return false;
       });
     },
-    [removeNote],
+    [removeNote, updateNote],
   );
 
   return (
     <div className="board" onDoubleClick={handleDoubleClick}>
       {!notes.length && <EmptyBoard />}
-      {notes.map((note) => (
+      {notes.map((note, index) => (
         <Note
           key={note.id}
           note={note}
+          index={index}
           onUpdate={updateNote}
           onRemove={removeNote}
-          onBringToFront={bringToFront}
+          onBringToFront={index !== notes.length - 1 ? bringToFront : undefined}
           onDragMove={checkOverTrash}
           onDragEnd={handleDragEnd}
         />
