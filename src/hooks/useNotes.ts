@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Note, NoteColor } from "../types";
 import { NOTE_DEFAULTS } from "../constants";
-import { isValidNote } from "../utils/validateNotes";
+import { debounce, isValidNote } from "../utils";
 
 const STORAGE_KEY = "notes";
 
@@ -19,9 +19,17 @@ const load = (): Note[] => {
 export const useNotes = () => {
   const [notes, setNotes] = useState<Note[]>(load);
 
+  const debouncedSave = useMemo(
+    () =>
+      debounce((n: Note[]) => {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(n));
+      }, 300),
+    [],
+  );
+
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
-  }, [notes]);
+    debouncedSave(notes);
+  }, [notes, debouncedSave]);
 
   const addNote = useCallback((x: number, y: number, color: NoteColor) => {
     setNotes((prev) => {

@@ -2,7 +2,6 @@ import "./Note.css";
 import { memo } from "react";
 import type { Note as NoteType } from "../../types";
 import { COLOR_MAP } from "../../constants";
-import { useNoteInteractions } from "../../hooks/useNoteInteractions";
 import RemoveIcon from "../../assets/icons/trash-full.svg?react";
 
 interface NoteProps {
@@ -11,29 +10,13 @@ interface NoteProps {
   onUpdate: (id: string, changes: Omit<Partial<NoteType>, "id">) => void;
   onRemove: (id: string) => void;
   onBringToFront?: (id: string) => void;
-  onDragMove?: (x: number, y: number) => void;
-  onDragEnd?: (id: string, pos: { x: number; y: number }) => void;
 }
 
 export const Note = memo<NoteProps>(
-  ({
-    note,
-    index,
-    onUpdate,
-    onRemove,
-    onBringToFront,
-    onDragMove,
-    onDragEnd,
-  }) => {
-    const {
-      elementRef,
-      onDragStart: handleDragStart,
-      onResizeStart,
-    } = useNoteInteractions(note, onUpdate, onDragMove, onDragEnd);
-
+  ({ note, index, onUpdate, onRemove, onBringToFront }) => {
     return (
       <div
-        ref={elementRef}
+        data-id={note.id}
         className="note"
         onMouseDown={() => onBringToFront?.(note.id)}
         onDoubleClick={(e) => e.stopPropagation()}
@@ -49,7 +32,6 @@ export const Note = memo<NoteProps>(
         <div
           className="note__header"
           style={{ background: COLOR_MAP[note.color].border }}
-          onMouseDown={handleDragStart}
         >
           <button
             className="note__delete"
@@ -68,8 +50,9 @@ export const Note = memo<NoteProps>(
           value={note.text}
           onChange={(e) => onUpdate(note.id, { text: e.target.value })}
           placeholder="Type something..."
+          onDragStart={(e) => e.preventDefault()}
         />
-        <div className="note__resize" onMouseDown={onResizeStart} />
+        <div className="note__resize" />
       </div>
     );
   },
