@@ -58,6 +58,8 @@ export const useNotes = () => {
 
   const bringToFront = useCallback((id: string) => {
     setNotes((prev) => {
+      if (prev.at(-1)?.id === id) return prev;
+
       const note = prev.find((note) => note.id === id);
       if (!note) return prev;
 

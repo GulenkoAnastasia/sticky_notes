@@ -1,5 +1,5 @@
 import "./Note.css";
-import { memo } from "react";
+import { memo, useRef } from "react";
 import type { Note as NoteType } from "../../types";
 import { COLOR_MAP } from "../../constants";
 import RemoveIcon from "../../assets/icons/trash-full.svg?react";
@@ -9,16 +9,24 @@ interface NoteProps {
   index: number;
   onUpdate: (id: string, changes: Omit<Partial<NoteType>, "id">) => void;
   onRemove: (id: string) => void;
-  onBringToFront?: (id: string) => void;
+  onBringToFront: (id: string) => void;
+  onPointerDown: (
+    e: React.PointerEvent<HTMLDivElement>,
+    noteRef: React.RefObject<HTMLDivElement | null>,
+    action: "drag" | "resize",
+  ) => void;
 }
 
 export const Note = memo<NoteProps>(
-  ({ note, index, onUpdate, onRemove, onBringToFront }) => {
+  ({ note, index, onUpdate, onRemove, onBringToFront, onPointerDown }) => {
+    const noteRef = useRef<HTMLDivElement | null>(null);
+
     return (
       <div
+        ref={noteRef}
         data-id={note.id}
         className="note"
-        onMouseDown={() => onBringToFront?.(note.id)}
+        onPointerDown={() => onBringToFront(note.id)}
         onDoubleClick={(e) => e.stopPropagation()}
         style={{
           left: note.x,
@@ -32,10 +40,13 @@ export const Note = memo<NoteProps>(
         <div
           className="note__header"
           style={{ background: COLOR_MAP[note.color].border }}
+          onPointerDown={(e) => {
+            onPointerDown(e, noteRef, "drag");
+          }}
         >
           <button
             className="note__delete"
-            onMouseDown={(e) => e.stopPropagation()}
+            onPointerDown={(e) => e.stopPropagation()}
             onClick={() => onRemove(note.id)}
           >
             <RemoveIcon
@@ -52,7 +63,12 @@ export const Note = memo<NoteProps>(
           placeholder="Type something..."
           onDragStart={(e) => e.preventDefault()}
         />
-        <div className="note__resize" />
+        <div
+          className="note__resize"
+          onPointerDown={(e) => {
+            onPointerDown(e, noteRef, "resize");
+          }}
+        />
       </div>
     );
   },
